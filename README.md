@@ -1,7 +1,7 @@
 # smart_car
 
 How to install:
-1. download the raspberry image for with pre-installed respeaker drivers:
+1. download the raspberry image with pre-installed respeaker drivers:
 https://pan.baidu.com/s/1bprWJr5   password:t1m7
 2. copy gcc_phat.py included in this repository to the folder in voice engine where there is a file with the same name
 3. find the setup.py and type "sudo python setup.py install"
