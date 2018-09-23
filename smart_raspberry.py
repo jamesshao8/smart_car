@@ -72,9 +72,9 @@ class doa_thread(threading.Thread):
     def run(self):
         global moving,last_movement_timestamp,doa_valid
         src = Source(rate=16000, channels=4, frames_size=320)
-        ch1 = ChannelPicker(channels=4, pick=1)
+        #ch1 = ChannelPicker(channels=4, pick=1)
         doa = DOA(rate=16000)
-        src.link(ch1)
+        #src.link(ch1)
         src.link(doa)
         src.recursive_start()
 
@@ -182,14 +182,15 @@ def main():
 
 
     cap=cv2.VideoCapture(0)
-    ret=cap.set(3,320)
-    ret=cap.set(4,240)
+    ret=cap.set(3,640)
+    ret=cap.set(4,480)
     #resize = 2
 
     avg = None
 
     while exit_now == 0:
         ret, frame = cap.read()
+        frame = cv2.resize(frame,None,fx=float(0.5),fy=float(0.5),interpolation=cv2.INTER_AREA)
         frame = cv2.flip(frame,-1)
 
 
@@ -209,7 +210,7 @@ def main():
         thresh = cv2.erode(thresh,kernel, iterations = 1)
         kernel = np.ones((13,13),np.uint8)
         thresh = cv2.dilate(thresh, kernel, iterations = 1)
-        #cv2.imshow('thre',thresh)
+        
         (cnts,_) = cv2.findContours(thresh.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
         max_area = 0
@@ -244,19 +245,18 @@ def main():
             x_mid = float((x1+x2)/2)
             y_mid = float((y1+y2)/2)
 
-            print x_mid,y_mid,x1,x2
+            print "cam middle x y", x_mid,y_mid
             if x_mid > (160 + 30) and np.abs(x2-x1) < 150 :
+                print "cam detected on right turn right"
                 mt = movement_thread(4,(np.abs(x_mid-160))/10)
                 mt.start()       
             elif x_mid < (160 - 30) and np.abs(x2-x1) < 150 :
+                print "cam detected on left turn left"
                 mt = movement_thread(3,(np.abs(x_mid-160))/10)
                 mt.start()
             else:
                 print "DB for cam"
-                #measure()
-
-                print "first:",str(distance)
-                
+                #measure()                
                 #if distance > 450:
                     #print "not detected by sonar"
                     #mt = movement_thread(1,np.abs(80))
